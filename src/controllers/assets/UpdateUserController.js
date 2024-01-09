@@ -75,8 +75,7 @@ class UpdateUserController {
       updateValues.push(user.password)
     }
 
-    updateFields.push("updated_at = ?")
-    updateValues.push(new Date())
+    updateFields.push("updated_at = DATETIME('now')")
 
     await database.run(
       `
