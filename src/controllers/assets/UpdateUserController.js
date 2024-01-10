@@ -35,8 +35,8 @@ class UpdateUserController {
     }
 
     // Update user information
-    user.name = name
-    user.email = email
+    user.name = name ?? user.name
+    user.email = email ?? user.email
 
     // Check if the old pasword is inserted
     if (password && !old_password) {
@@ -59,31 +59,16 @@ class UpdateUserController {
         "Inputed password is the same as the current password.", 409)
     }
     // Update user information
-    const updateFields = []
-    const updateValues = []
-
-    if (name) {
-      updateFields.push("name = ?")
-      updateValues.push(user.name)
-    }
-    if (email) {
-      updateFields.push("email = ?")
-      updateValues.push(user.email)
-    }
-    if (password) {
-      updateFields.push("password = ?")
-      updateValues.push(user.password)
-    }
-
-    updateFields.push("updated_at = DATETIME('now')")
-
-    await database.run(
-      `
+     await database.run(
+       `
       UPDATE users SET
-      ${updateFields.join(", ")}
+      name = ?,
+      email = ?,
+      password = ?,
+      updated_at = DATETIME('now')
       WHERE id = ?`,
-      [...updateValues, userId]
-    )
+       [user.name, user.email, user.password, userId]
+     )
 
     // Return success message
     return response.status(200).json({ message: "Info updated successfully" })
