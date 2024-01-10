@@ -19,7 +19,7 @@ class UpdateUserController {
       // Validate email format
       if (email && !isValidEmail(email)) {
         console.log("Invalid email format.")
-        throw new AppError("Invalid email format.", 400)
+        throw new AppError("Invalid email format.", 422)
       }
 
       // Establish a database connection
