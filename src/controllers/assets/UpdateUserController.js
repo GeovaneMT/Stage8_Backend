@@ -1,10 +1,14 @@
+// Import necessary dependencies and modules
 const { hash, compare } = require("bcryptjs")
 const AppError = require("../../utils/AppError")
 const sqliteConnection = require("../../dataBase/sqLite")
 const { NODE_ENV } = process.env // Access the NODE_ENV environment variable
 
+// Define a class for updating user information
 class UpdateUserController {
+  // Define an asynchronous method for updating user information
   async update(request, response) {
+    // Destructure data from the request body and parameters
     const { name, email, password, old_password } = request.body
     const userId = request.params.userId // Ensure consistent use of userId
     let database
@@ -12,6 +16,13 @@ class UpdateUserController {
     try {
       console.log("Updating user information...")
 
+      // Validate email format
+      if (email && !isValidEmail(email)) {
+        console.log("Invalid email format.")
+        throw new AppError("Invalid email format.", 400)
+      }
+
+      // Establish a database connection
       database = await sqliteConnection()
 
       // Fetch the existing user by ID
@@ -26,8 +37,6 @@ class UpdateUserController {
         "SELECT * FROM users WHERE email = ? AND id <> ?",
         [email, userId]
       )
-
-      console.log("Fetched user with updated email:", userWithUpdatedEmail)
 
       // Check if the user exists
       if (!user) {
@@ -77,6 +86,7 @@ class UpdateUserController {
           throw new AppError("Old password incorrect", 401)
         }
 
+        // Hash and update the password
         try {
           user.password = await hash(password, 8)
         } catch (error) {
@@ -91,7 +101,7 @@ class UpdateUserController {
         }
       }
 
-      console.log("Old password is correct or not provided.")
+      console.log("Old password is correct.")
 
       // Check if the updated password is the same as the current password
       if (password === old_password) {
@@ -107,7 +117,7 @@ class UpdateUserController {
 
       console.log("Updated password is different from the current password.")
 
-      // Update user information
+      // Update user information in the database
       try {
         await database.run(
           `
@@ -145,4 +155,12 @@ class UpdateUserController {
   }
 }
 
+// Export the UpdateUserController class
 module.exports = UpdateUserController
+
+// Helper function to validate email format
+function isValidEmail(email) {
+  // Use a regular expression to validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
