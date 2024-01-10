@@ -1,7 +1,7 @@
-const AppError = require("../../utils/AppError")
-const { connectDatabase, closeDatabase } = require("./database")
-const { validateEmail, validateRequiredFields } = require("./userValidation")
-const { hashPassword } = require("./passwordHashing")
+const AppError = require("../utils/AppError")
+const { connectDatabase, closeDatabase } = require("./assets/database")
+const { validateEmail, validateRequiredFields } = require("./assets/userValidation")
+const { hashPassword } = require("./assets/passwordHashing")
 
 class CreateUserController {
   async create(request, response) {
