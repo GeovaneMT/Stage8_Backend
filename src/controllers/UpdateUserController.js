@@ -1,5 +1,8 @@
 const { connectDatabase, closeDatabase } = require("./assets/database")
-const { validateEmail, validateOldPassword } = require("./assets/userValidation")
+const {
+  validateEmail,
+  validateOldPassword,
+} = require("./assets/userValidation")
 const { hashPassword, comparePasswords } = require("./assets/passwordHashing")
 const AppError = require("../utils/AppError")
 
@@ -7,6 +10,7 @@ class UpdateUserController {
   async update(request, response) {
     const { name, email, password, old_password } = request.body
     const userId = request.params.userId
+    const NODE_ENV = process.env.NODE_ENV || "development"
     let database
 
     try {
@@ -78,7 +82,9 @@ class UpdateUserController {
       }
 
       // Hash and update the password
-      user.password = await hashPassword(password)
+      if (password && password !== old_password) {
+        user.password = await hashPassword(password)
+      }
 
       // Check if the updated password is the same as the current password
       if (password === old_password) {
@@ -109,13 +115,7 @@ class UpdateUserController {
         console.log("User information updated successfully.")
       } catch (error) {
         // Handle database update errors
-        const errorMessage =
-          NODE_ENV === "development"
-            ? `Error updating user: ${error.message}`
-            : "Error updating user information"
-
-        console.log(errorMessage)
-        throw new AppError(errorMessage, 500)
+        handleDatabaseError(error)
       }
 
       // Return success message
@@ -130,3 +130,14 @@ class UpdateUserController {
 }
 
 module.exports = UpdateUserController
+
+function handleDatabaseError(error) {
+  // Handle database update errors
+  const errorMessage =
+    NODE_ENV === "development"
+      ? `Error updating user: ${error.message}`
+      : "Error updating user information"
+
+  console.log(errorMessage)
+  throw new AppError(errorMessage, 500)
+}
