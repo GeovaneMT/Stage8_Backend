@@ -6,8 +6,8 @@ const {
 const { hashPassword, comparePasswords } = require("../assets/passwordHashing")
 const AppError = require("../../utils/AppError")
 
-class UpdateUserController {
-  async update(request, response) {
+async function UpdateUserController(request, response) {
+
     const { name, email, password, old_password } = request.body
     const userId = request.params.userId
     const NODE_ENV = process.env.NODE_ENV || "development"
@@ -127,7 +127,6 @@ class UpdateUserController {
       }
     }
   }
-}
 
 module.exports = UpdateUserController
 

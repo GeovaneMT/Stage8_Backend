@@ -1,13 +1,21 @@
 const knex = require("../../dataBase/knex")
 
-class DeleteNotesController {
-  async delete(request, response) {
-
+async function DeleteNotesController(request, response) {
+  try {
     const { id } = request.params
 
-    await knex("notes").where({ id }).delete()
+    const deleteCount = await knex("notes").where({ id }).delete()
 
-    return response.status(201).json()
+    if (deleteCount === 0) {
+      return response.status(404).json({ error: "Note not found" })
+    }
+
+    return response.status(204).json() // 204 No Content for successful deletion
+  } catch (error) {
+    console.error("Error deleting note:", error)
+
+    // Handle other generic errors
+    return response.status(500).json({ error: "Internal Server Error" })
   }
 }
 

@@ -1,15 +1,33 @@
 const CreateUserController = require("./users/CreateUserController")
 const UpdateUserController = require("./users/UpdateUserController")
 
-const CreateNotesController = require("./notes/CreateNotesController")
+const indexNoteController = require("./notes/indexNoteController")
+const createNoteController = require("./notes/CreateNotesController")
 const ShowNotesController = require("./notes/ShowNotesController")
 const DeleteNotesController = require("./notes/DeleteNotesController")
 
-const createUser = new CreateUserController()
-const updateUser = new UpdateUserController()
+class UserController {
+  async create(request, response) {
+    await CreateUserController(request, response)
+  }
+  async update(request, response) {
+    await UpdateUserController(request, response)
+  }
+}
 
-const createNote = new CreateNotesController()
-const showNote = new ShowNotesController()
-const deleteNote = new DeleteNotesController()
+class NotesController {
+  async index(request, response) {
+    await indexNoteController(request, response)
+  }
+  async create(request, response) {
+    await createNoteController(request, response)
+  }
+  async show(request, response) {
+    await ShowNotesController(request, response)
+  }
+  async delete(request, response) {
+    await DeleteNotesController(request, response)
+  }
+}
 
-module.exports = { createUser, updateUser, createNote, showNote, deleteNote }
+module.exports = { UserController, NotesController }
