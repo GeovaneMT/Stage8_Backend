@@ -1,10 +1,10 @@
-const { connectDatabase, closeDatabase } = require("./assets/database")
+const { connectDatabase, closeDatabase } = require("../assets/database")
 const {
   validateEmail,
   validateOldPassword,
-} = require("./assets/userValidation")
-const { hashPassword, comparePasswords } = require("./assets/passwordHashing")
-const AppError = require("../utils/AppError")
+} = require("../assets/userValidation")
+const { hashPassword, comparePasswords } = require("../assets/passwordHashing")
+const AppError = require("../../utils/AppError")
 
 class UpdateUserController {
   async update(request, response) {
