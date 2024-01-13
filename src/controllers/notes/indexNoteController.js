@@ -1,11 +1,21 @@
 const knex = require("../../dataBase/knex")
 
 async function indexNoteController(request, response) {
-    const { user_id } = request.query
+    const { title, user_id, tags } = request.query
 
-    // Retrieve notes for the specified user_id and order them by title
-    const notes = await knex("notes").where({ user_id }).orderBy("title")
+    let notes
 
+    if (tags) {
+      const filterTags = tags.split(",").map((tag) => tag.trim())
+
+      notes = await knex("tags").whereIn("name", filterTags)
+    } else {
+      notes = await knex("notes")
+        .where({ user_id })
+        .whereLike("title", `%${title}%`)
+        .orderBy("title")
+    }
+    
     // Respond with the retrieved notes
     return response.status(200).json(notes)
     
