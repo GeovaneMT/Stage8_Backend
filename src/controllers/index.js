@@ -6,6 +6,8 @@ const createNoteController = require("./notes/CreateNotesController")
 const ShowNotesController = require("./notes/ShowNotesController")
 const DeleteNotesController = require("./notes/DeleteNotesController")
 
+const indexTagController = require("./tags/indexTagController")
+
 class UserController {
   async create(request, response) {
     await CreateUserController(request, response)
@@ -30,4 +32,10 @@ class NotesController {
   }
 }
 
-module.exports = { UserController, NotesController }
+class TagsController {
+  async index(request, response) {
+    await indexTagController(request, response)
+  }
+}
+
+module.exports = { UserController, NotesController, TagsController }
