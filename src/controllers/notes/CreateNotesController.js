@@ -1,6 +1,6 @@
 const knex = require("../../dataBase/knex")
 
-async function createNoteController(request, response) {
+async function CreateNoteController(request, response) {
   try {
     const { title, description, tags, links } = request.body
     const { user_id } = request.params
@@ -51,4 +51,4 @@ async function createNoteController(request, response) {
   }
 }
 
-module.exports = createNoteController
+module.exports = CreateNoteController

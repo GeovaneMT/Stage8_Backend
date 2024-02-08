@@ -2,11 +2,13 @@ const CreateUserController = require("./users/CreateUserController")
 const UpdateUserController = require("./users/UpdateUserController")
 
 const indexNoteController = require("./notes/indexNoteController")
-const createNoteController = require("./notes/CreateNotesController")
+const CreateNoteController = require("./notes/CreateNotesController")
 const ShowNotesController = require("./notes/ShowNotesController")
 const DeleteNotesController = require("./notes/DeleteNotesController")
 
 const indexTagController = require("./tags/indexTagController")
+
+const CreateSessionsController = require("./Sessions/createSessionsController")
 
 class UserController {
   async create(request, response) {
@@ -22,7 +24,7 @@ class NotesController {
     await indexNoteController(request, response)
   }
   async create(request, response) {
-    await createNoteController(request, response)
+    await CreateNoteController(request, response)
   }
   async show(request, response) {
     await ShowNotesController(request, response)
@@ -38,4 +40,15 @@ class TagsController {
   }
 }
 
-module.exports = { UserController, NotesController, TagsController }
+class SessionsController {
+  async create(request, response) {
+    await CreateSessionsController(request, response)
+  }
+}
+
+module.exports = {
+  UserController,
+  NotesController,
+  TagsController,
+  SessionsController
+}
