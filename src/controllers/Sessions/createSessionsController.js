@@ -12,9 +12,13 @@ async function createSessionController(request, response) {
 
   // Fetching user from the database
   const user = await knex("users").where({ email }).first()
+    console.log(
+      `User fetched: id: ${user.id}, name: ${user.name}, email: ${user.email}`
+    )
 
   // Handling case where user doesn't exist or password is incorrect
   if (!user || !(await compare(password, user.password))) {
+    console.log("E-mail and/or password incorrect")
     throw new AppError("E-mail and/or password incorrect.", 401)
   }
 
@@ -22,10 +26,11 @@ async function createSessionController(request, response) {
   const { secret, expiresIn } = authConfig.jwt
   const token = sign({}, secret, {
     subject: String(user.id),
-    expiresIn
+    expiresIn,
   })
-
+  
   // Returning user information along with token
+  console.log(`new token created and exported for user id ${user.id}`)
   return response.json({ user, token })
 }
 

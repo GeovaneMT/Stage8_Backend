@@ -21,7 +21,7 @@ function ensureAuth(request, response, next) {
       id: Number(userId),
     }
 
-    console.log(`Auth Middleware ended`)
+    console.log(`User Authenticated`)
     return next()
 
   } catch (error) {
