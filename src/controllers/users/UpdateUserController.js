@@ -9,7 +9,7 @@ const AppError = require("../../utils/AppError")
 async function UpdateUserController(request, response) {
 
     const { name, email, password, old_password } = request.body
-    const userId = request.params.userId
+    const userId = request.user.id
     const NODE_ENV = process.env.NODE_ENV || "development"
     let database
 
