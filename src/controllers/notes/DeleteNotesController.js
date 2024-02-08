@@ -1,5 +1,5 @@
 const knex = require("../../dataBase/knex")
-const AppError = require("../utils/AppError")
+const AppError = require("../../utils/AppError")
 
 async function DeleteNotesController(request, response) {
   try {
