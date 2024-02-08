@@ -3,6 +3,9 @@ const AppError = require("../utils/AppError")
 const authConfig = require("../configs/auth")
 
 function ensureAuth(request, response, next) {
+
+  console.log(`Auth Middleware started`)
+
   const authHeader = request.headers.authorization
 
   if (!authHeader) {
@@ -18,8 +21,11 @@ function ensureAuth(request, response, next) {
       id: Number(userId),
     }
 
+    console.log(`Auth Middleware ended`)
     return next()
+
   } catch (error) {
+    console.log(`Invalid JWT`)
     throw new AppError("Invalid JWT.", 401)
   }
 }

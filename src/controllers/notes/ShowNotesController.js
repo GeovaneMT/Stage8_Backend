@@ -1,7 +1,9 @@
 const knex = require("../../dataBase/knex")
+const AppError = require("../utils/AppError")
 
 async function ShowNotesController(request, response) {
   try {
+    console.log("Showing Notes")
     const { id } = request.params
 
     // Fetch note
@@ -19,13 +21,14 @@ async function ShowNotesController(request, response) {
       .where({ note_id: id })
       .orderBy("created_at")
 
+    console.log("Note Showed")
     return response.status(200).json({
       ...note,
       tags,
       links,
     })
   } catch (error) {
-    console.error("Error fetching note:", error)
+    throw new AppError("Error fetching note:", error)
 
     // Handle other generic errors
     return response.status(500).json({ error: "Internal Server Error" })

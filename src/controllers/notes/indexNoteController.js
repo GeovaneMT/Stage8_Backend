@@ -2,6 +2,7 @@ const knex = require("../../dataBase/knex")
 
 async function indexNoteController(request, response) {
     const { title, user_id, tags } = request.query
+    console.log("Indexing Notes")
 
     let notes
 
@@ -23,6 +24,7 @@ async function indexNoteController(request, response) {
         .orderBy("title")
     }
     // Respond with the retrieved notes
+    console.log("Note Indexed")
     return response.status(200).json(notes)
     
 }

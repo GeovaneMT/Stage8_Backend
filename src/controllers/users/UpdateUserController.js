@@ -30,7 +30,7 @@ async function UpdateUserController(request, response) {
         userId,
       ])
 
-      console.log("Fetched existing user:", user)
+      console.log("Fetched existing user:", user.name, userId)
 
       // Fetch the user with the updated email
       const userWithUpdatedEmail = await database.get(

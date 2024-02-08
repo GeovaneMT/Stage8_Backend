@@ -7,9 +7,8 @@ const { compare } = require("bcryptjs")
 async function createSessionController(request, response) {
   console.log("Logging in ...")
 
-  // Destructuring request body for email and password
   const { email, password } = request.body
-  console.log("Received request body:", { email, password })
+  console.log("Received request from body")
 
   // Fetching user from the database
   const user = await knex("users").where({ email }).first()
@@ -21,7 +20,10 @@ async function createSessionController(request, response) {
 
   // Creating JWT token for authentication
   const { secret, expiresIn } = authConfig.jwt
-  const token = sign({ userId: user.id }, secret, { expiresIn })
+  const token = sign({}, secret, {
+    subject: String(user.id),
+    expiresIn
+  })
 
   // Returning user information along with token
   return response.json({ user, token })

@@ -37,10 +37,11 @@ async function CreateUserController(request, response) {
       "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
       [name, email, hashedPassword]
     )
-    console.log("User inserted into the database.")
 
+    console.log("User inserted into the database.")
     return response.status(201).json({ message: "User created successfully" })
   } catch (error) {
+    
     console.error("Error occurred:", error.message)
 
     if (error.message.includes("Failed to connect")) {

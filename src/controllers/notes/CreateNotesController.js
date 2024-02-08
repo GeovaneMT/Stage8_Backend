@@ -1,7 +1,11 @@
 const knex = require("../../dataBase/knex")
+const AppError = require("../utils/AppError")
 
 async function CreateNoteController(request, response) {
   try {
+
+    console.log("Creating note...")
+
     const { title, description, tags, links } = request.body
     const { user_id } = request.params
 
@@ -35,9 +39,11 @@ async function CreateNoteController(request, response) {
       await knex("tags").insert(tagsInsert)
     }
 
+    console.log("Note Created")
+
     return response.status(201).json({ message: "Note created successfully" })
   } catch (error) {
-    console.error("Error creating note:", error)
+    throw new AppError("Error creating note:", error)
 
     // Handle specific database-related errors
     if (error.code === "SQLITE_CONSTRAINT") {
