@@ -7,7 +7,7 @@ async function CreateNoteController(request, response) {
     console.log("Creating note...")
 
     const { title, description, tags, links } = request.body
-    const { user_id } = request.params
+    const user_id = request.user.id
 
     // Insert note
     const [note_id] = await knex("notes").insert({
