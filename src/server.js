@@ -22,7 +22,6 @@ app.use(routes)
 app.use(cors())
 
 app.use("/files", express.static(uploadConfig.UPLOADS_FOLDER))
-n
 app.use(errorHandler)
 
 app.listen(PORT, () => {
