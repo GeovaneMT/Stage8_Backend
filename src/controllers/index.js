@@ -10,12 +10,20 @@ const indexTagController = require("./tags/indexTagController")
 
 const CreateSessionsController = require("./sessions/createSessionsController")
 
+const UpdateAvatarController = require("./avatar/UpdateAvatarController")
+
 class UserController {
   async create(request, response) {
     await CreateUserController(request, response)
   }
   async update(request, response) {
     await UpdateUserController(request, response)
+  }
+}
+
+class AvatarController {
+  async update(request, response) {
+    await UpdateAvatarController(request, response)
   }
 }
 
@@ -50,5 +58,6 @@ module.exports = {
   UserController,
   NotesController,
   TagsController,
-  SessionsController
+  SessionsController,
+  AvatarController,
 }
