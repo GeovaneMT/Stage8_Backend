@@ -48,7 +48,7 @@ async function createSessionController(request, response) {
   })
 
   // Returning user information along with token
-  console.log(`New token created and exported for user id ${user.id}`)
+  console.log(`New token created and exported for user id ${user.id}. User logged`)
   return response.json({ user, token })
 }
 
