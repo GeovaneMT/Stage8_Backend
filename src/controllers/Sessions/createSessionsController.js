@@ -12,12 +12,20 @@ async function createSessionController(request, response) {
 
   // Fetching user from the database
   const user = await knex("users").where({ email }).first()
+
+  // Handling case where user doesn't exist
+  if (!user) {
+    console.log("E-mail and/or password incorrect")
+    throw new AppError("E-mail and/or password incorrect.", 401)
+  } else {
     console.log(
       `User fetched: id: ${user.id}, name: ${user.name}, email: ${user.email}`
     )
+  }
 
-  // Handling case where user doesn't exist or password is incorrect
-  if (!user || !(await compare(password, user.password))) {
+  // Comparing passwords
+  const passwordMatch = await compare(password, user.password)
+  if (!passwordMatch) {
     console.log("E-mail and/or password incorrect")
     throw new AppError("E-mail and/or password incorrect.", 401)
   }
@@ -28,9 +36,9 @@ async function createSessionController(request, response) {
     subject: String(user.id),
     expiresIn,
   })
-  
+
   // Returning user information along with token
-  console.log(`new token created and exported for user id ${user.id}`)
+  console.log(`New token created and exported for user id ${user.id}`)
   return response.json({ user, token })
 }
 
