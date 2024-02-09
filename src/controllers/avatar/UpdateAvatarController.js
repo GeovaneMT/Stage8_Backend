@@ -5,7 +5,7 @@ const DiskStorage = require("../../providers/DiskStorage")
 async function UpdateAvatarController(request, response) {
   console.log("Avatar upload initiated...")
 
-  const userId = request.user.userId
+  const userId = request.user.id
   const avatarFilename = request.file.filename
 
   const diskStorage = new DiskStorage()
@@ -39,7 +39,7 @@ async function UpdateAvatarController(request, response) {
     user.avatar = filename
 
     // Update user avatar in the database
-    await knex("users").where({ id: userId }).update({ avatar: filename })
+    await knex("users").where({ id: userId }).update(user)
 
     // Sending success response
     console.log("Avatar updated successfully.")

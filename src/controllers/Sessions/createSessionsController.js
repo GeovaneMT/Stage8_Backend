@@ -13,7 +13,7 @@ async function createSessionController(request, response) {
   console.log("Received request from body")
 
   // Check email format
-  console.log("validating email format")
+  console.log("validating email format...")
   if (!email || !validateEmail(email)) {
     console.log("error: Invalid email format")
     throw new AppError("Invalid email format.", 400)
@@ -28,7 +28,7 @@ async function createSessionController(request, response) {
   // Comparing passwords
   const passwordMatch = await compare(password, user.password)
 
-  console.log("validating inputs")
+  console.log("validating inputs...")
 
   // Handling case where user doesn't exist
   if (!user || !passwordMatch) {
