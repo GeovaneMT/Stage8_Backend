@@ -8,7 +8,7 @@ const DeleteNotesController = require("./notes/DeleteNotesController")
 
 const indexTagController = require("./tags/indexTagController")
 
-const CreateSessionsController = require("./Sessions/createSessionsController")
+const CreateSessionsController = require("./sessions/createSessionsController")
 
 class UserController {
   async create(request, response) {
