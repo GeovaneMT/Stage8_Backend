@@ -11,6 +11,7 @@ async function createSessionController(request, response) {
 
   const { email, password } = request.body
   console.log("Received request from body")
+  console.log(`test email: ${email}, test password ${password}`)
 
   // Check email format
   console.log("validating email format...")
@@ -22,16 +23,21 @@ async function createSessionController(request, response) {
   }
 
   // Fetching user from the database
-  const user = await knex("users").where({ email }).first()
   console.log("trying to fetch user from database...")
+  const user = await knex("users").where({ email }).first()
+
+  // Logging if user not found
+  if (!user) {
+    console.log("User not found in the database")
+    throw new AppError("User not found in the database", 401)
+  }
 
   // Comparing passwords
   const passwordMatch = await compare(password, user.password)
-
   console.log("validating inputs...")
 
-  // Handling case where user doesn't exist
-  if (!user || !passwordMatch) {
+  // Handling case where password doesn't match
+  if (!passwordMatch) {
     console.log("E-mail and/or password incorrect")
     throw new AppError("E-mail and/or password incorrect.", 401)
   } else {
@@ -48,7 +54,9 @@ async function createSessionController(request, response) {
   })
 
   // Returning user information along with token
-  console.log(`New token created and exported for user id ${user.id}. User logged`)
+  console.log(
+    `New token created and exported for user id ${user.id}. User logged`
+  )
   return response.json({ user, token })
 }
 
