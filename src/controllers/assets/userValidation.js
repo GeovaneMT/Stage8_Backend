@@ -19,9 +19,12 @@ function validateRequiredFields(requestBody) {
   })
 }
 
-function validateOldPassword(password, oldPassword) {
-  if (password && !oldPassword) {
-    throw new AppError("Old password is required", 401)
+function validateOldPassword(password, Old_Password) {
+  console.log(`validating passes...`)
+  if (password && !Old_Password) {
+    console.log({ password }, { Old_Password })
+    console.log("Old password is incorrect")
+    throw new AppError("Old password is incorrect", 401)
   }
 }
 
