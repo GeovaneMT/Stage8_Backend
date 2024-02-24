@@ -18,14 +18,4 @@ function validateRequiredFields(requestBody) {
     }
   })
 }
-
-function validateOldPassword(password, Old_Password) {
-  console.log(`validating passes...`)
-  if (password && !Old_Password) {
-    console.log({ password }, { Old_Password })
-    console.log("Old password is incorrect")
-    throw new AppError("Old password is incorrect", 401)
-  }
-}
-
-module.exports = { validateEmail, validateRequiredFields, validateOldPassword }
+module.exports = { validateEmail, validateRequiredFields }

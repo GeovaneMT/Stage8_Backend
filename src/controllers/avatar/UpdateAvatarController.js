@@ -43,7 +43,10 @@ async function UpdateAvatarController(request, response) {
 
     // Sending success response
     console.log("Avatar updated successfully.")
-    response.json({ message: "Avatar updated successfully.", avatar: filename })
+    response.json({
+      message: "Avatar updated successfully 2.",
+      avatar: filename,
+    })
   } catch (error) {
     console.error("Error while updating avatar:", error)
     response.status(error.statusCode || 500).json({ message: error.message })

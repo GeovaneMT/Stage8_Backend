@@ -12,8 +12,6 @@ async function UpdateUserController(request, response) {
   const NODE_ENV = process.env.NODE_ENV || "development"
   let database
 
-  console.log({ Old_password })
-
   function handleDatabaseError(error) {
     // Handle database update errors
     const errorMessage =
@@ -66,74 +64,56 @@ async function UpdateUserController(request, response) {
 
     console.log("Email is not in use by another user.")
 
-    // Check if anything has changed
-    if (
-      name === user.name ||
-      email === user.email ||
-      password === user.password
-    ) {
-      throw new AppError("Nada foi alterado", 401)
-    }
-
     // Update user information
     user.name = name || user.name
     user.email = email || user.email
 
-    // Check if the password is informed
-    if (Old_password && !password) {
-      throw new AppError("Nova Senha não informada", 401)
-    }
-
     // Check if the old password is correct when password is informed
-    if (password) {
-      validateOldPassword(password, Old_password)
+    if (password && Old_password) {
+
       const isOldPasswordCorrect = await comparePasswords(
         Old_password,
         user.password
       )
 
+      // Hash and update the password if correct
       if (!isOldPasswordCorrect) {
         console.log("Old password incorrect.")
         throw new AppError("Old password incorrect", 401)
-      }
-
-      // Hash and update the password
-      if (password && password !== Old_password) {
+      } else {
         user.password = await hashPassword(password)
+        console.log("password Hashed and updated.")
       }
 
-      // Check if the updated password is the same as the current password
-      if (password === Old_password) {
-        const errorMessage =
-          NODE_ENV === "development"
-            ? "Inputted password is the same as the current password."
-            : "Error updating password"
+    } else if(password && !Old_password) {
 
-        console.log(errorMessage)
-        throw new AppError(errorMessage, 409)
-      }
+      console.log("Old password not informed. info not updated")
+      throw new AppError("Old password not informed. info not updated", 401)
 
-      console.log("Updated password is different from the current password.")
+    } else if (!password && Old_password){
+
+      console.log("New password not informed. info not updated")
+      throw new AppError("New password not informed. info not updated", 401)
+
     }
-
-    // Update user information in the database
-    try {
-      await database.run(
-        `
+      // Update user information in the database
+      try {
+        await database.run(
+          `
           UPDATE users SET
           name = ?,
           email = ?,
           password = ?,
           updated_at = DATETIME('now')
           WHERE id = ?`,
-        [user.name, user.email, user.password, userId]
-      )
+          [user.name, user.email, user.password, userId]
+        )
 
-      console.log("User information updated successfully.")
-    } catch (error) {
-      // Handle database update errors
-      handleDatabaseError(error)
-    }
+        console.log("User information updated successfully.")
+      } catch (error) {
+        // Handle database update errors
+        handleDatabaseError(error)
+      }
 
     // Return success message
     console.log("Info updated successfully.")
