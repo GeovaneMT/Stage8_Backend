@@ -5,9 +5,6 @@ async function indexNoteController(request, response) {
   const user_id = request.user.id
   console.log("Indexing Notes")
 
-
-  let notes
-
   if (tags) {
     const filterTags = tags.split(",").map((tag) => tag.trim())
 
@@ -24,9 +21,18 @@ async function indexNoteController(request, response) {
       .whereLike("title", `%${title}%`)
       .orderBy("title")
   }
+
+  const userTags = await knex("tags").where({ user_id })
+  const notesWithTags = notes.map((note) => {
+    const noteTags = userTags.filter((tag) => tag.note_id === note.id)
+    return {
+      ...note,
+      tags: noteTags,
+    }
+  })
   // Respond with the retrieved notes
   console.log("Note Indexed")
-  return response.status(200).json(notes)
+  return response.status(200).json(notesWithTags)
 }
 
 module.exports = indexNoteController
