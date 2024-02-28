@@ -23,22 +23,19 @@ class UserRepository {
       await closeDatabase(database)
     }
   }
-
+  
   async findByEmail(email) {
     let database
     try {
-      // Connect to SQLite database
       database = await sqliteConnection()
-
       console.log("Finding user by email:", email)
-      // Retrieve user by email from the database
-      const user = await database.get("SELECT * FROM users WHERE email = ?", [
-        email,
-      ])
+      const user = await database.get("SELECT * FROM users WHERE email = (?)", [email])
       console.log("User found by email:", user)
       return user
+    } catch (error) {
+      console.error("Error finding user by email:", error)
+      throw error
     } finally {
-      // Close the database connection
       await closeDatabase(database)
     }
   }

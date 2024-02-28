@@ -1,7 +1,8 @@
-const { AppError         } = require("../../utils/AppError")
-const { hashPassword     } = require("../assets/passwordHashing")
-const { UserRepository   } = require("../../repositories/userRepository")
-const { validateEmail, validateRequiredFields,} = require("../assets/userValidation")
+const { AppError } = require("../../utils/AppError")
+const { UserRepository } = require("../../repositories/userRepository")
+const { UserCreateService } = require("../../services/userCreateService")
+const { validateRequiredFields, validateEmail } = require("../assets/userValidation")
+
 
 async function CreateUserController(request, response) {
   try {
@@ -10,8 +11,9 @@ async function CreateUserController(request, response) {
 
     //request from frontend json
     const { name, email, password } = request.body
-    console.log(`Received request body: name: ${name}, email: ${email}, password: unhashed`)
-
+    console.log(
+      `Received request body: name: ${name}, email: ${email}, password: unhashed`
+    )
     //validate if all inputs exists
     validateRequiredFields(request.body)
 
@@ -20,24 +22,12 @@ async function CreateUserController(request, response) {
       throw new AppError("Invalid email format.", 400)
     }
 
-    //user repository - database connect
     const userRepository = new UserRepository()
-
-    //check if user exists in databse and if email is already in use
-    const checkUserExists = await userRepository.findByEmail(email)
-    if (checkUserExists) {
-      throw new AppError("This email is already in use.", 409)
-    }
-
-    //password hashing...
-    const hashedPassword = await hashPassword(password)
-
-    await userRepository.create({ name, email, password: hashedPassword })
+    const userCreateService = new UserCreateService(userRepository)
+    await userCreateService.execute({name, email, password})
 
     return response.status(201).json({ message: "User created successfully" })
-
   } catch (error) {
-
     // Check for specific error messages and throw corresponding AppError
     if (error.message.includes("Failed to connect")) {
       console.error("Failed to connect to the database. Error:", error)
@@ -66,7 +56,6 @@ async function CreateUserController(request, response) {
 
     // If none of the specific error messages match, re-throw the original error
     throw error
-
   }
 }
 
