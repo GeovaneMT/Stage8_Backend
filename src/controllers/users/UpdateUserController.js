@@ -6,19 +6,6 @@ const AppError = require("../../utils/AppError")
 async function UpdateUserController(request, response) {
   const { name, email, New_password, Old_password } = request.body
   const userId = request.user.id
-  const NODE_ENV = process.env.NODE_ENV || "development"
-  let database
-
-  function handleDatabaseError(error) {
-    // Handle database update errors
-    const errorMessage =
-      NODE_ENV === "development"
-        ? `Error updating user: ${error.message}`
-        : "Error updating user information"
-
-    console.log(errorMessage)
-    throw new AppError(errorMessage, 500)
-  }
 
   try {
     console.log("Updating user information...")
