@@ -1,13 +1,10 @@
 const { connectDatabase, closeDatabase } = require("../assets/database")
-const {
-  validateEmail,
-  validateOldPassword,
-} = require("../assets/userValidation")
+const { validateEmail } = require("../assets/userValidation")
 const { hashPassword, comparePasswords } = require("../assets/passwordHashing")
 const AppError = require("../../utils/AppError")
 
 async function UpdateUserController(request, response) {
-  const { name, email, password, Old_password } = request.body
+  const { name, email, New_password, Old_password } = request.body
   const userId = request.user.id
   const NODE_ENV = process.env.NODE_ENV || "development"
   let database
@@ -53,7 +50,6 @@ async function UpdateUserController(request, response) {
       console.log("User not found.")
       throw new AppError("User not found", 404)
     }
-
     console.log("User exists.")
 
     // Check if the updated email is already in use
@@ -69,28 +65,27 @@ async function UpdateUserController(request, response) {
     user.email = email || user.email
 
     // Check if the old password is correct when password is informed
-    if (password && Old_password) {
+    if (New_password && Old_password) {
 
       const isOldPasswordCorrect = await comparePasswords(
         Old_password,
         user.password
       )
-
       // Hash and update the password if correct
       if (!isOldPasswordCorrect) {
         console.log("Old password incorrect.")
         throw new AppError("Old password incorrect", 401)
       } else {
-        user.password = await hashPassword(password)
+        hashedPassword = await hashPassword(New_password)
         console.log("password Hashed and updated.")
       }
 
-    } else if(password && !Old_password) {
+    } else if(New_password && !Old_password) {
 
       console.log("Old password not informed. info not updated")
       throw new AppError("Old password not informed. info not updated", 401)
 
-    } else if (!password && Old_password){
+    } else if (!New_password && Old_password){
 
       console.log("New password not informed. info not updated")
       throw new AppError("New password not informed. info not updated", 401)
@@ -106,7 +101,7 @@ async function UpdateUserController(request, response) {
           password = ?,
           updated_at = DATETIME('now')
           WHERE id = ?`,
-          [user.name, user.email, user.password, userId]
+          [user.name, user.email, hashedPassword, userId]
         )
 
         console.log("User information updated successfully.")
@@ -117,7 +112,9 @@ async function UpdateUserController(request, response) {
 
     // Return success message
     console.log("Info updated successfully.")
-    return response.status(200).json({ message: "Info updated successfully" })
+    console.log(New_password, Old_password, hashedPassword, user.password )
+
+    return response.status(200).json({ message: "Info updated successfully", hashedPassword })
   } finally {
     if (database) {
       await closeDatabase(database)
