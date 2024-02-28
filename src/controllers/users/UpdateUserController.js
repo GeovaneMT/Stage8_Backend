@@ -1,7 +1,6 @@
-const { connectDatabase, closeDatabase } = require("../assets/database")
+const { UserRepository } = require("../../repositories/userRepository")
+const { AppError } = require("../../utils/AppError")
 const { validateEmail } = require("../assets/userValidation")
-const { hashPassword, comparePasswords } = require("../assets/passwordHashing")
-const AppError = require("../../utils/AppError")
 
 async function UpdateUserController(request, response) {
   const { name, email, New_password, Old_password } = request.body
@@ -16,36 +15,25 @@ async function UpdateUserController(request, response) {
       throw new AppError("Invalid email format.", 422)
     }
 
-    // Establish a database connection
-    database = await connectDatabase()
+    // Database Connect
+    const userRepository = new UserRepository()
 
     // Fetch the existing user by ID
-    const user = await database.get("SELECT * FROM users WHERE id = ?", [
-      userId,
-    ])
+    const user = await userRepository.findById(userId)
 
-    console.log("Fetched existing user:", user.name, userId)
-
-    // Fetch the user with the updated email
-    const userWithUpdatedEmail = await database.get(
-      "SELECT * FROM users WHERE email = ? AND id <> ?",
-      [email, userId]
-    )
-
-    // Check if the user exists
     if (!user) {
       console.log("User not found.")
       throw new AppError("User not found", 404)
     }
-    console.log("User exists.")
+
+    // Fetch the user with the updated email
+    const userWithUpdatedEmail = await userRepository.findByEmail(email)
 
     // Check if the updated email is already in use
-    if (userWithUpdatedEmail) {
+    if (userWithUpdatedEmail && userWithUpdatedEmail.id !== userId) {
       console.log("This email is already in use.")
       throw new AppError("This email is already in use.", 409)
     }
-
-    console.log("Email is not in use by another user.")
 
     // Update user information
     user.name = name || user.name
@@ -53,8 +41,7 @@ async function UpdateUserController(request, response) {
 
     // Check if the old password is correct when password is informed
     if (New_password && Old_password) {
-
-      const isOldPasswordCorrect = await comparePasswords(
+      const isOldPasswordCorrect = await userRepository.hashAndComparePassword(
         Old_password,
         user.password
       )
@@ -63,49 +50,27 @@ async function UpdateUserController(request, response) {
         console.log("Old password incorrect.")
         throw new AppError("Old password incorrect", 401)
       } else {
-        hashedPassword = await hashPassword(New_password)
-        console.log("password Hashed and updated.")
+        const hashedPassword = await userRepository.hashPassword(New_password)
+        user.password = hashedPassword
       }
-
-    } else if(New_password && !Old_password) {
-
-      console.log("Old password not informed. info not updated")
-      throw new AppError("Old password not informed. info not updated", 401)
-
-    } else if (!New_password && Old_password){
-
-      console.log("New password not informed. info not updated")
-      throw new AppError("New password not informed. info not updated", 401)
-
+    } else if (New_password && !Old_password) {
+      console.log("Old password not informed. Info not updated.")
+      throw new AppError("Old password not informed. Info not updated.", 401)
+    } else if (!New_password && Old_password) {
+      console.log("New password not informed. Info not updated.")
+      throw new AppError("New password not informed. Info not updated.", 401)
     }
-      // Update user information in the database
-      try {
-        await database.run(
-          `
-          UPDATE users SET
-          name = ?,
-          email = ?,
-          password = ?,
-          updated_at = DATETIME('now')
-          WHERE id = ?`,
-          [user.name, user.email, hashedPassword, userId]
-        )
 
-        console.log("User information updated successfully.")
-      } catch (error) {
-        // Handle database update errors
-        handleDatabaseError(error)
-      }
+    // Update user information in the database
+    await userRepository.update(user)
 
     // Return success message
     console.log("Info updated successfully.")
-    console.log(New_password, Old_password, hashedPassword, user.password )
-
-    return response.status(200).json({ message: "Info updated successfully", hashedPassword })
-  } finally {
-    if (database) {
-      await closeDatabase(database)
-    }
+    return response.status(200).json({ message: "Info updated successfully" })
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating user information:", error)
+    throw error
   }
 }
 

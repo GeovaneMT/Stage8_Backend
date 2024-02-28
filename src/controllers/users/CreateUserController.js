@@ -1,50 +1,46 @@
-const AppError = require("../../utils/AppError")
-const { connectDatabase, closeDatabase } = require("../assets/database")
-const { validateEmail, validateRequiredFields } = require("../assets/userValidation")
-const { hashPassword } = require("../assets/passwordHashing")
+const { AppError         } = require("../../utils/AppError")
+const { hashPassword     } = require("../assets/passwordHashing")
+const { UserRepository   } = require("../../repositories/userRepository")
+const { validateEmail, validateRequiredFields,} = require("../assets/userValidation")
 
 async function CreateUserController(request, response) {
-  
-  let database
   try {
+    //Creating user...
     console.log("Creating user...")
 
+    //request from frontend json
     const { name, email, password } = request.body
-    console.log("Received request body:", request.body)
+    console.log(`Received request body: name: ${name}, email: ${email}, password: unhashed`)
 
+    //validate if all inputs exists
+    validateRequiredFields(request.body)
+
+    //validate email format
     if (!email || !validateEmail(email)) {
       throw new AppError("Invalid email format.", 400)
     }
 
-    validateRequiredFields(request.body)
+    //user repository - database connect
+    const userRepository = new UserRepository()
 
-    database = await connectDatabase()
-    console.log("Connected to the database.")
-
-    const checkUserExists = await database.get(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    )
-
+    //check if user exists in databse and if email is already in use
+    const checkUserExists = await userRepository.findByEmail(email)
     if (checkUserExists) {
       throw new AppError("This email is already in use.", 409)
     }
 
+    //password hashing...
     const hashedPassword = await hashPassword(password)
-    console.log("Password hashed successfully.")
 
-    await database.run(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword]
-    )
+    await userRepository.create({ name, email, password: hashedPassword })
 
-    console.log("User inserted into the database.")
     return response.status(201).json({ message: "User created successfully" })
-  } catch (error) {
-    
-    console.error("Error occurred:", error.message)
 
+  } catch (error) {
+
+    // Check for specific error messages and throw corresponding AppError
     if (error.message.includes("Failed to connect")) {
+      console.error("Failed to connect to the database. Error:", error)
       throw new AppError(
         "Failed to connect to the database. Please try again.",
         500
@@ -52,6 +48,7 @@ async function CreateUserController(request, response) {
     }
 
     if (error.message.includes("Failed to execute")) {
+      console.error("Failed to execute the database query. Error:", error)
       throw new AppError(
         "Failed to execute the database query. Please try again.",
         500
@@ -63,15 +60,13 @@ async function CreateUserController(request, response) {
         process.env.NODE_ENV === "production"
           ? "Failed to create user."
           : "Failed to hash the password. Please try again."
-
+      console.error(errorMessage)
       throw new AppError(errorMessage, 500)
     }
 
+    // If none of the specific error messages match, re-throw the original error
     throw error
-  } finally {
-    if (database) {
-      await closeDatabase(database)
-    }
+
   }
 }
 
