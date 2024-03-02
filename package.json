@@ -9,6 +9,9 @@
     "migrate": "knex migrate:latest",
     "test": "jest --watch"
   },
+  "engines": {
+    "node": ">= v18.17.1 <18.18.0"
+  },
   "keywords": [],
   "author": "Geovane M.T",
   "license": "ISC",
