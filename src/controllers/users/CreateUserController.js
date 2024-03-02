@@ -1,19 +1,19 @@
-const { AppError } = require("../../utils/AppError")
 const { UserRepository } = require("../../repositories/userRepository")
 const { UserCreateService } = require("../../services/userCreateService")
-const { validateRequiredFields, validateEmail } = require("../assets/userValidation")
 
+const { AppError } = require("../../utils/AppError")
+const { validateRequiredFields, validateEmail } = require("../assets/userValidation")
 
 async function CreateUserController(request, response) {
   try {
-    //Creating user...
     console.log("Creating user...")
 
     //request from frontend json
     const { name, email, password } = request.body
     console.log(
-      `Received request body: name: ${name}, email: ${email}, password: unhashed`
+      `Received request body: name: ${name}, email: ${email}, password: hidden unhashed password`
     )
+
     //validate if all inputs exists
     validateRequiredFields(request.body)
 
@@ -22,11 +22,14 @@ async function CreateUserController(request, response) {
       throw new AppError("Invalid email format.", 400)
     }
 
+    //database connection
     const userRepository = new UserRepository()
     const userCreateService = new UserCreateService(userRepository)
-    await userCreateService.execute({name, email, password})
+    await userCreateService.execute({ name, email, password })
 
+    //response json
     return response.status(201).json({ message: "User created successfully" })
+
   } catch (error) {
     // Check for specific error messages and throw corresponding AppError
     if (error.message.includes("Failed to connect")) {

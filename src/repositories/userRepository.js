@@ -29,9 +29,14 @@ class UserRepository {
     try {
       database = await sqliteConnection()
       console.log("Finding user by email:", email)
-      const user = await database.get("SELECT * FROM users WHERE email = (?)", [email])
-      console.log("User found by email:", user)
+      const user = await database.get("SELECT * FROM users WHERE email = ?", [email])
+
+      user === undefined
+        ? console.log("User not in database")
+        : console.log("User already in database:", { user })
+
       return user
+
     } catch (error) {
       console.error("Error finding user by email:", error)
       throw error
@@ -72,7 +77,7 @@ class UserRepository {
       // Connect to SQLite database
       database = await sqliteConnection()
 
-      console.log("Updating user:", user)
+      console.log("Updating user...")
       // Update user in the database
       await database.run(
         `
@@ -83,15 +88,16 @@ class UserRepository {
           updated_at = DATETIME('now')
           WHERE id = ?`,
         [user.name, user.email, user.password, user.id]
-      )
-      console.log("User updated successfully")
+        
+        )
+        console.log("new user:", user)
     } finally {
       // Close the database connection
       await closeDatabase(database)
     }
   }
 
-  async hashAndComparePassword(plainPassword, hashedPassword) {
+  async ComparePasswords(plainPassword, hashedPassword) {
     // Compare plain password with hashed password
     const isPasswordCorrect = await comparePasswords(
       plainPassword,

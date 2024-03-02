@@ -7,16 +7,19 @@ class UserCreateService {
   }
 
   async execute({ name, email, password }) {
+    
     //check if user exists in databse and if email is already in use
     const checkUserExists = await this.userRepository.findByEmail(email)
     if (checkUserExists) {
-      throw new AppError("This email is already in use.", 409)
+      throw new AppError("User not created. This email is already in use.", 409)
     }
 
     //password hashing...
     const hashedPassword = await hashPassword(password)
 
-    await this.userRepository.create({ name, email, password: hashedPassword })
+    const userCreated = await this.userRepository.create({ name, email, password: hashedPassword })
+
+    return userCreated
   }
 }
 module.exports = { UserCreateService }
