@@ -1,7 +1,7 @@
 require("dotenv/config")
 require("express-async-errors")
 
-const migrationsRun = require("./database/sqLite/migrations")
+const migrationsRun = require("./dataBase/sqLite/migrations")
 const errorHandler = require("./utils/errorMiddleware")
 const uploadConfig = require("./configs/upload")
 
