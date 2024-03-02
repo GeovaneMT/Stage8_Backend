@@ -1,3 +1,4 @@
+require("dotenv/config")
 require("express-async-errors")
 
 const migrationsRun = require("./database/sqLite/migrations")
@@ -27,7 +28,7 @@ app.use(routes)
 app.use(errorHandler)
 
 // Set the port number
-const PORT = 3333
+const PORT = process.env.PORT || 3333
 
 // Start the server
 app.listen(PORT, () => {
