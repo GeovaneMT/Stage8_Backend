@@ -8,7 +8,7 @@ const DeleteNotesController = require("./notes/DeleteNotesController")
 
 const indexTagController = require("./tags/indexTagController")
 
-const CreateSessionsController = require("./sessions/createSessionsController/index.js")
+const CreateSessionsController = require("./sessions/createSessionsController")
 
 const UpdateAvatarController = require("./avatar/UpdateAvatarController")
 
