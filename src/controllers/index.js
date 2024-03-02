@@ -8,7 +8,7 @@ const DeleteNotesController = require("./notes/DeleteNotesController")
 
 const indexTagController = require("./tags/indexTagController")
 
-const CreateSessionsController = require("./sessions/createSessionController")
+const createSessionController = require("./sessions/createSessionController")
 
 const UpdateAvatarController = require("./avatar/UpdateAvatarController")
 
@@ -50,7 +50,7 @@ class TagsController {
 
 class SessionsController {
   async create(request, response) {
-    await CreateSessionsController(request, response)
+    await createSessionController(request, response)
   }
 }
 
