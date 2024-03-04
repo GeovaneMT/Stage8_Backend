@@ -25,6 +25,8 @@ async function createSessionController(request, response) {
   // Fetching user from the database
   console.log("trying to fetch user from database...")
   const user = await knex("users").where({ email }).first()
+  console.log("user fetched")
+
 
   // Logging if user not found
   if (!user) {
