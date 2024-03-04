@@ -1,10 +1,9 @@
-const knex = require("knex")
-const { AppError } = require("../../utils/AppError")
-const authConfig = require("../../configs/auth")
-const { sign } = require("jsonwebtoken")
-const { compare } = require("bcryptjs")
-const { validateEmail } = require("../assets/userValidation")
+const { UserRepository } = require("../../repositories/userRepository")
+const { UserCreateSessionService } = require("../../services/userCreateSessionService")
 
+const { AppError } = require("../../utils/AppError")
+
+const { validateEmail } = require("../assets/userValidation")
 
 async function createSessionController(request, response) {
   console.log("Logging in ...")
@@ -22,42 +21,14 @@ async function createSessionController(request, response) {
     console.log("Email format is valid")
   }
 
-  // Fetching user from the database
-  console.log("trying to fetch user from database...")
-  const user = await knex("users").where({ email }).first()
-  console.log("user fetched")
-
-  // Logging if user not found
-  if (!user) {
-    console.log("User not found in the database")
-    throw new AppError("User not found in the database", 401)
-  }
-
-  // Comparing passwords
-  const passwordMatch = await compare(password, user.password)
-  console.log("validating inputs...")
-
-  // Handling case where password doesn't match
-  if (!passwordMatch) {
-    console.log("E-mail and/or password incorrect")
-    throw new AppError("E-mail and/or password incorrect.", 401)
-  } else {
-    console.log(
-      `User fetched: id: ${user.id}, name: ${user.name}, email: ${user.email}`
-    )
-  }
-
-  // Creating JWT token for authentication
-  const { secret, expiresIn } = authConfig.jwt
-  const token = sign({}, secret, {
-    subject: String(user.id),
-    expiresIn,
+  // Database Connect
+  const userRepository = new UserRepository()
+  const userCreateSessionService = new UserCreateSessionService(userRepository)
+  const { user, token } = await userCreateSessionService.execute({
+    email,
+    password,
   })
 
-  // Returning user information along with token
-  console.log(
-    `New token created and exported for user id ${user.id}. User logged`
-  )
   return response.json({ user, token })
 }
 
