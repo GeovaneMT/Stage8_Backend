@@ -23,14 +23,7 @@ module.exports = {
   production: {
     client: "sqlite3",
     connection: {
-      filename: path.resolve(
-        __dirname,
-        "path",
-        "to",
-        "production",
-        "database.db"
-      ),
-      // Replace "path/to/production" with the actual path to your production database file
+      filename: path.resolve(__dirname, "src", "database", "database.db"),
     },
     pool: {
       afterCreate: (conn, cb) => conn.run("PRAGMA foreign_keys = ON", cb),
