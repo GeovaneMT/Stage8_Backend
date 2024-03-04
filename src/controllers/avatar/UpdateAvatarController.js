@@ -37,9 +37,11 @@ async function UpdateAvatarController(request, response) {
 
     const filename = await diskStorage.saveFile(avatarFilename)
     user.avatar = filename
+      console.log("pass1")
 
     // Update user avatar in the database
     await knex("users").where({ id: userId }).update(user)
+      console.log("pass2")
 
     // Sending success response
     console.log("Avatar updated successfully.")
